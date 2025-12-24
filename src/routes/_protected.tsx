@@ -1,10 +1,10 @@
 import { Navigate, createFileRoute, Outlet } from '@tanstack/react-router'
 import { useAuthStore } from '@/store/auth'
+import { useBreadcrumbStore } from '@/store/breadcrumb'
 import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
-import { useLocation } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
@@ -12,22 +12,11 @@ export const Route = createFileRoute('/_protected')({
 
 function ProtectedLayout() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
-  const location = useLocation()
-  const pathname = location.pathname
+  const breadcrumbs = useBreadcrumbStore((state) => state.breadcrumbs)
 
   if (!isAuthenticated) {
     return <Navigate to="/" />
   }
-
-  // Generar breadcrumbs desde la ruta
-  const segments = pathname.split('/').filter(Boolean)
-  const breadcrumbs = segments.map((segment, index) => {
-    const path = '/' + segments.slice(0, index + 1).join('/')
-    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
-    const isLast = index === segments.length - 1
-
-    return { label, path, isLast }
-  })
 
   return (
     <SidebarProvider>
@@ -46,10 +35,10 @@ function ProtectedLayout() {
                   <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
                 </BreadcrumbItem>
 
-                {breadcrumbs.slice(1).map(({ label, path, isLast }) => (
+                {breadcrumbs.map(({ label, path }, index) => (
                   <BreadcrumbItem key={path}>
                     <BreadcrumbSeparator />
-                    {isLast ? (
+                    {index === breadcrumbs.length - 1 ? (
                       <BreadcrumbPage>{label}</BreadcrumbPage>
                     ) : (
                       <BreadcrumbLink href={path}>{label}</BreadcrumbLink>

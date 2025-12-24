@@ -1,6 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import userService from '@/services/user/user.service'
+import { useBreadcrumbStore } from '@/store/breadcrumb'
 import type { User } from '@/services/user/user.schema'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -16,6 +17,7 @@ function RouteComponent() {
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const setBreadcrumbs = useBreadcrumbStore((state) => state.setBreadcrumbs)
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -24,6 +26,11 @@ function RouteComponent() {
         setError(null)
         const userData = await userService.get(userId)
         setUser(userData)
+        // Establecer breadcrumbs con el nombre del usuario
+        setBreadcrumbs([
+          { label: 'Usuarios', path: '/users' },
+          { label: userData.name, path: `/users/${userId}` }
+        ])
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Error al cargar el usuario')
       } finally {
@@ -32,7 +39,7 @@ function RouteComponent() {
     }
 
     fetchUser()
-  }, [userId])
+  }, [userId, setBreadcrumbs])
 
   if (loading) {
     return (

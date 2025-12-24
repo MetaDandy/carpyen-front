@@ -1,9 +1,11 @@
-import { useState } from 'react'
+import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
+import { useBreadcrumbStore } from '@/store/breadcrumb'
+import { useTableFilters } from '@/hooks/use-table-filters'
 import userService from '@/services/user/user.service'
 import { createQueryParams } from '@/services/pagination.schema'
 import type { User } from '@/services/user/user.schema'
@@ -20,12 +22,30 @@ export const Route = createFileRoute('/_protected/users/')({
 })
 
 function Users() {
-  const [page, setPage] = useState(1)
-  const [limit] = useState(10)
+  const { 
+    page, 
+    limit, 
+    searchQuery, 
+    searchField, 
+    setPage, 
+    setLimit,
+    setSearchQuery, 
+    setSearchField 
+  } = useTableFilters({ initialSearchField: 'name' })
+  const { setBreadcrumbs } = useBreadcrumbStore()
+
+  useEffect(() => {
+    setBreadcrumbs([
+      { label: 'Usuarios', path: '/users' }
+    ])
+  }, [setBreadcrumbs])
 
   const { data, isLoading } = useQuery({
-    queryKey: ['users', page, limit],
-    queryFn: () => userService.getAll(createQueryParams(page, limit)),
+    queryKey: ['users', page, limit, searchQuery, searchField],
+    queryFn: () => userService.getAll(createQueryParams(page, limit, {
+      search: searchQuery,
+      search_field: searchField,
+    })),
   })
 
   // Definir columnas
@@ -101,6 +121,22 @@ function Users() {
         currentPage={page}
         onPageChange={setPage}
         loading={isLoading}
+        total={data?.total || 0}
+        offset={data?.offset || 0}
+        limit={limit}
+        onLimitChange={setLimit}
+        search={{
+          query: searchQuery,
+          field: searchField,
+          onQueryChange: setSearchQuery,
+          onFieldChange: setSearchField,
+          columns: [
+            { key: 'name', label: 'Nombre' },
+            { key: 'email', label: 'Email' },
+            { key: 'phone', label: 'Teléfono' },
+            { key: 'role', label: 'Rol' },
+          ]
+        }}
       />
     </div>
   )
