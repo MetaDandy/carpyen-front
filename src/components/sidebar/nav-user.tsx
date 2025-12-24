@@ -27,6 +27,8 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import ToggleTheme from "../theme/toggle.theme"
+import { useAuthStore } from "@/store/auth"
 
 export function NavUser({
   user,
@@ -38,6 +40,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { logout } = useAuthStore()
 
   return (
     <SidebarMenu>
@@ -98,9 +101,13 @@ export function NavUser({
                 <Bell />
                 Notifications
               </DropdownMenuItem>
+              <ToggleTheme />
+
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={logout}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>
