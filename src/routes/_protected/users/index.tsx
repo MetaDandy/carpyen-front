@@ -1,15 +1,18 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
 import { useTableFilters } from '@/hooks/use-table-filters'
+import { useAppStore } from '@/store/app'
 import userService from '@/services/user/user.service'
 import { createQueryParams } from '@/services/pagination.schema'
-import type { User } from '@/services/user/user.schema'
+import type { User, Create, Update } from '@/services/user/user.schema'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
+import { toast } from 'sonner'
+import UserForm from '@/components/users/user.form'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +25,7 @@ export const Route = createFileRoute('/_protected/users/')({
 })
 
 function Users() {
+  const queryClient = useQueryClient()
   const { 
     page, 
     limit, 
@@ -33,6 +37,7 @@ function Users() {
     setSearchField 
   } = useTableFilters({ initialSearchField: 'name' })
   const { setBreadcrumbs } = useBreadcrumbStore()
+  const { openDialog } = useAppStore()
 
   useEffect(() => {
     setBreadcrumbs([
@@ -47,6 +52,69 @@ function Users() {
       search_field: searchField,
     })),
   })
+
+  // Mutación para crear usuario
+  const createMutation = useMutation({
+    mutationFn: (data: Create) => userService.create(data),
+    onSuccess: () => {
+      toast.success('Usuario creado exitosamente')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Error al crear usuario')
+    },
+  })
+
+  // Mutación para actualizar usuario
+  const updateMutation = useMutation({
+    mutationFn: ({ id, data }: { id: string; data: Update }) =>
+      userService.update(id, data),
+    onSuccess: () => {
+      toast.success('Usuario actualizado exitosamente')
+      queryClient.invalidateQueries({ queryKey: ['users'] })
+    },
+    onError: (error) => {
+      toast.error(error instanceof Error ? error.message : 'Error al actualizar usuario')
+    },
+  })
+
+  // Función para abrir el diálogo de crear usuario
+  const handleOpenCreateDialog = () => {
+    openDialog({
+      title: 'Crear Nuevo Usuario',
+      content: (
+        <UserForm
+          onSubmit={async (formData) => {
+            await createMutation.mutateAsync(formData as Create)
+          }}
+          isLoading={createMutation.isPending}
+        />
+      ),
+      confirmText: undefined,
+      cancelText: 'Cerrar',
+    })
+  }
+
+  // Función para abrir el diálogo de editar usuario
+  const handleOpenEditDialog = (user: User) => {
+    openDialog({
+      title: 'Editar Usuario',
+      content: (
+        <UserForm
+          user={user}
+          onSubmit={async (formData) => {
+            await updateMutation.mutateAsync({
+              id: user.id,
+              data: formData as Update,
+            })
+          }}
+          isLoading={updateMutation.isPending}
+        />
+      ),
+      confirmText: undefined,
+      cancelText: 'Cerrar',
+    })
+  }
 
   // Definir columnas
   const columns: ColumnDef<User>[] = [
@@ -95,7 +163,13 @@ function Users() {
               >
                 Ver detalles
               </DropdownMenuItem>
-              <DropdownMenuItem>Editar</DropdownMenuItem>
+              <DropdownMenuItem
+                onClick={() => {
+                  handleOpenEditDialog(user)
+                }}
+              >
+                Editar
+              </DropdownMenuItem>
               <DropdownMenuItem className="text-red-600">Eliminar</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -111,7 +185,7 @@ function Users() {
           <h1 className="text-3xl font-bold tracking-tight">Usuarios</h1>
           <p className="text-muted-foreground mt-1">Gestiona los usuarios del sistema</p>
         </div>
-        <Button>Nuevo Usuario</Button>
+        <Button onClick={handleOpenCreateDialog}>Nuevo Usuario</Button>
       </div>
 
       <DataTable
