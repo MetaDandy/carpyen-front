@@ -1,7 +1,10 @@
 import { Navigate, createFileRoute, Outlet } from '@tanstack/react-router'
 import { useAuthStore } from '@/store/auth'
 import { AppSidebar } from '@/components/sidebar/app-sidebar'
-import { SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { Separator } from '@/components/ui/separator'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { useLocation } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
@@ -9,17 +12,58 @@ export const Route = createFileRoute('/_protected')({
 
 function ProtectedLayout() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
+  const location = useLocation()
+  const pathname = location.pathname
 
   if (!isAuthenticated) {
     return <Navigate to="/" />
   }
 
+  // Generar breadcrumbs desde la ruta
+  const segments = pathname.split('/').filter(Boolean)
+  const breadcrumbs = segments.map((segment, index) => {
+    const path = '/' + segments.slice(0, index + 1).join('/')
+    const label = segment.charAt(0).toUpperCase() + segment.slice(1).replace(/-/g, ' ')
+    const isLast = index === segments.length - 1
+
+    return { label, path, isLast }
+  })
+
   return (
     <SidebarProvider>
       <AppSidebar />
-      <main className="w-full">
-        <Outlet />
-      </main>
+      <SidebarInset>
+        <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
+          <div className="flex items-center gap-2 px-4 w-full">
+            <SidebarTrigger className="-ml-1" />
+            <Separator
+              orientation="vertical"
+              className="mr-2 h-4"
+            />
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                </BreadcrumbItem>
+
+                {breadcrumbs.slice(1).map(({ label, path, isLast }) => (
+                  <BreadcrumbItem key={path}>
+                    <BreadcrumbSeparator />
+                    {isLast ? (
+                      <BreadcrumbPage>{label}</BreadcrumbPage>
+                    ) : (
+                      <BreadcrumbLink href={path}>{label}</BreadcrumbLink>
+                    )}
+                  </BreadcrumbItem>
+                ))}
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+        <main className="flex-1 overflow-y-auto">
+          <Outlet />
+        </main>
+      </SidebarInset>
     </SidebarProvider>
   )
 }

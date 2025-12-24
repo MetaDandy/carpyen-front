@@ -1,5 +1,6 @@
 import userService from '@/services/user/user.service'
 import { create } from 'zustand'
+import { persist } from 'zustand/middleware'
 
 interface AuthStore {
   isAuthenticated: boolean
@@ -10,33 +11,40 @@ interface AuthStore {
   logout: () => void
 }
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  isAuthenticated: false,
-  loading: false,
-  token: '',
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      isAuthenticated: false,
+      loading: false,
+      token: '',
 
-  login: async (email: string, password: string) => {
-    set({ loading: true })
-    try {
-      const tokken = await userService.login({ email, password })
-      set({ token: tokken })
+      login: async (email: string, password: string) => {
+        set({ loading: true })
+        try {
+          const token = await userService.login({ email, password })
+          set({ token, isAuthenticated: true })
+        } catch (error) {
+          console.error('Error al iniciar sesión:', error)
+          throw error
+        } finally {
+          set({ loading: false })
+        }
+      },
 
-      set({ isAuthenticated: true })
-    } catch (error) {
-      console.error('Error al iniciar sesión:', error)
-      throw error
-    } finally {
-      set({ loading: false })
+      setToken: (token: string) => {
+        set({ token, isAuthenticated: true })
+      },
+
+      logout: () => {
+        set({ isAuthenticated: false, token: '' })
+      },
+    }),
+    {
+      name: 'auth-store', 
+      partialize: (state) => ({
+        token: state.token,
+        isAuthenticated: state.isAuthenticated,
+      }), 
     }
-  },
-
-  setToken: (token: string) => {
-    set({ token })
-    localStorage.setItem('token', token)
-  },
-
-  logout: () => {
-    set({ isAuthenticated: false })
-    localStorage.removeItem('token')
-  },
-}))
+  )
+)

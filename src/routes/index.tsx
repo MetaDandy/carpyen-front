@@ -22,12 +22,11 @@ function Login() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    try {
-      await login(email, password)
-      toast('Has iniciado sesión correctamente')
-    } catch (error) {
-      toast.error('Email o contraseña incorrectos')
-    }
+    toast.promise(login(email, password), {
+      loading: 'Iniciando sesión...',
+      success: 'Has iniciado sesión correctamente',
+      error: (err) => (err as Error).message,
+    })
   }
 
   return (
