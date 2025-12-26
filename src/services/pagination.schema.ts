@@ -2,7 +2,7 @@ import { z } from 'zod'
 
 // Schema para los parámetros de query
 const QueryParamsSchema = z.object({
-  page: z.number().int().min(1).default(1),
+  offset: z.number().int().min(0).default(0),
   limit: z.number().int().min(1).max(100).default(10),
   order_by: z.string().optional(),
   sort_direction: z.enum(['asc', 'desc']).optional(),
@@ -33,12 +33,12 @@ type Paginated<T> = {
 
 // Helper para crear opciones de paginación
 const createQueryParams = (
-  page: number = 1,
+  offset: number = 0,
   limit: number = 10,
   options?: Partial<QueryParams>
 ): QueryParams => {
   return QueryParamsSchema.parse({
-    page,
+    offset,
     limit,
     ...options,
   })

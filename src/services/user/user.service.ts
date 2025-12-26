@@ -1,6 +1,6 @@
 import axios from 'axios'
 import api from "@/lib/api";
-import type { Login, User, Create, Update, UpdateProfile } from "./user.schema";
+import type { Login, User, CreateUser, UpdateUser, UpdateUserProfile } from "./user.schema";
 import type { Paginated, QueryParams } from '../pagination.schema';
 
 class UserService {
@@ -54,7 +54,7 @@ class UserService {
         }
     }
 
-    async create(data: Create): Promise<void> {
+    async create(data: CreateUser): Promise<void> {
         try {
             await api.post('/users', data)
         } catch (error) {
@@ -65,7 +65,7 @@ class UserService {
         }
     }
 
-    async update(id: string, data: Update): Promise<void> {
+    async update(id: string, data: UpdateUser): Promise<void> {
         try {
             await api.patch(`/users/${id}`, data)
         } catch (error) {
@@ -76,7 +76,7 @@ class UserService {
         }
     }
 
-    async updateProfile(data: UpdateProfile): Promise<void> {
+    async updateProfile(data: UpdateUserProfile): Promise<void> {
         try {
             await api.patch('/users/me', data)
         } catch (error) {

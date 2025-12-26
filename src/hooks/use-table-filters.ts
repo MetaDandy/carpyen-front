@@ -2,43 +2,43 @@ import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 
 interface UseTableFiltersOptions {
-  initialPage?: number
+  initialOffset?: number
   initialLimit?: number
   initialSearchQuery?: string
   initialSearchField?: string
 }
 
 export function useTableFilters(options: UseTableFiltersOptions = {}) {
-  const [page, setPage] = useState(options.initialPage ?? 1)
+  const [offset, setOffset] = useState(options.initialOffset ?? 0)
   const [limit, setLimit] = useState(options.initialLimit ?? 10)
   const [searchQuery, setSearchQuery] = useState(options.initialSearchQuery ?? '')
   const [searchField, setSearchField] = useState(options.initialSearchField ?? '')
   const queryClient = useQueryClient()
 
   const resetFilters = () => {
-    setPage(1)
+    setOffset(0)
     setLimit(options.initialLimit ?? 10)
     setSearchQuery('')
     setSearchField(options.initialSearchField ?? '')
   }
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage)
+  const handleOffsetChange = (newOffset: number) => {
+    setOffset(Math.max(0, newOffset))
   }
 
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit)
-    setPage(1) // Reset a página 1 cuando cambias el límite
+    setOffset(0) // Reset a offset 0 cuando cambias el límite
   }
 
   const handleSearchQueryChange = (query: string) => {
     setSearchQuery(query)
-    setPage(1) // Reset a página 1 cuando cambias la búsqueda
+    setOffset(0) // Reset a offset 0 cuando cambias la búsqueda
   }
 
   const handleSearchFieldChange = (field: string) => {
     setSearchField(field)
-    setPage(1) // Reset a página 1 cuando cambias el campo
+    setOffset(0) // Reset a offset 0 cuando cambias el campo
   }
 
   const invalidateQueries = (queryKey: string[]) => {
@@ -46,11 +46,11 @@ export function useTableFilters(options: UseTableFiltersOptions = {}) {
   }
 
   return {
-    page,
+    offset,
     limit,
     searchQuery,
     searchField,
-    setPage: handlePageChange,
+    setOffset: handleOffsetChange,
     setLimit: handleLimitChange,
     setSearchQuery: handleSearchQueryChange,
     setSearchField: handleSearchFieldChange,

@@ -25,11 +25,11 @@ export const Route = createFileRoute('/_protected/users/')({
 
 function Users() {
   const { 
-    page, 
+    offset, 
     limit, 
     searchQuery, 
     searchField, 
-    setPage, 
+    setOffset, 
     setLimit,
     setSearchQuery, 
     setSearchField 
@@ -44,14 +44,12 @@ function Users() {
   }, [setBreadcrumbs])
 
   const { data, isLoading } = useQuery({
-    queryKey: ['users', page, limit, searchQuery, searchField],
-    queryFn: () => userService.getAll(createQueryParams(page, limit, {
+    queryKey: ['users', offset, limit, searchQuery, searchField],
+    queryFn: () => userService.getAll(createQueryParams(offset, limit, {
       search: searchQuery,
       search_field: searchField,
     })),
   })
-
-  console.log('Usuarios cargados:', data)
 
   // Función para abrir el diálogo de crear usuario
   const handleOpenCreateDialog = () => {
@@ -154,14 +152,12 @@ function Users() {
       <DataTable
         columns={columns}
         data={data?.data || []}
-        pageCount={data?.pages || 1}
-        currentPage={page}
-        onPageChange={setPage}
-        loading={isLoading}
         total={data?.total || 0}
         offset={data?.offset || 0}
         limit={limit}
+        onOffsetChange={setOffset}
         onLimitChange={setLimit}
+        loading={isLoading}
         search={{
           query: searchQuery,
           field: searchField,

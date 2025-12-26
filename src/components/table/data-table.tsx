@@ -35,28 +35,24 @@ interface SearchConfig {
 interface DataTableProps<TData> {
   columns: ColumnDef<TData>[]
   data: TData[]
-  pageCount: number
-  currentPage: number
-  onPageChange: (page: number) => void
-  loading?: boolean
   total: number
   offset: number
   limit: number
+  onOffsetChange: (offset: number) => void
   onLimitChange?: (limit: number) => void
+  loading?: boolean
   search?: SearchConfig
 }
 
 export function DataTable<TData>({
   columns,
   data,
-  pageCount,
-  currentPage,
-  onPageChange,
-  loading = false,
   total,
   offset,
   limit,
+  onOffsetChange,
   onLimitChange,
+  loading = false,
   search,
 }: DataTableProps<TData>) {
   const table = useReactTable({
@@ -67,6 +63,21 @@ export function DataTable<TData>({
 
   // Calcular el número inicial para la numeración de filas
   const startNumber = offset + 1
+  const endNumber = Math.min(offset + limit, total)
+  const totalPages = Math.ceil(total / limit)
+  const currentPage = Math.floor(offset / limit) + 1
+
+  const handlePreviousPage = () => {
+    const newOffset = Math.max(0, offset - limit)
+    onOffsetChange(newOffset)
+  }
+
+  const handleNextPage = () => {
+    const newOffset = offset + limit
+    if (newOffset < total) {
+      onOffsetChange(newOffset)
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -100,7 +111,7 @@ export function DataTable<TData>({
       {/* Paginación arriba */}
       <div className="flex items-center justify-between">
         <div className="text-sm text-muted-foreground">
-          Mostrando {data.length === 0 ? 0 : startNumber} - {Math.min(offset + limit, total)} de {total} registros
+          Mostrando {data.length === 0 ? 0 : startNumber} - {endNumber} de {total} registros
         </div>
         <div className="flex gap-3 items-center">
           {onLimitChange && (
@@ -119,21 +130,21 @@ export function DataTable<TData>({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onPageChange(Math.max(1, currentPage - 1))}
-              disabled={currentPage === 1 || loading}
+              onClick={handlePreviousPage}
+              disabled={offset === 0 || loading}
             >
               <ChevronLeft className="h-4 w-4" />
             </Button>
             <div className="flex items-center gap-2 px-2">
               <span className="text-sm">
-                {currentPage} / {pageCount}
+                {currentPage} / {totalPages}
               </span>
             </div>
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onPageChange(Math.min(pageCount, currentPage + 1))}
-              disabled={currentPage === pageCount || loading}
+              onClick={handleNextPage}
+              disabled={offset + limit >= total || loading}
             >
               <ChevronRight className="h-4 w-4" />
             </Button>
