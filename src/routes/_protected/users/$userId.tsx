@@ -1,12 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useEffect, useState } from 'react'
-import userService from '@/services/user/user.service'
+import { useEffect } from 'react'
+import { useGetUser } from '@/hooks/users/useQuery.user'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
-import type { User } from '@/services/user/user.schema'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Skeleton } from '@/components/ui/skeleton'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { AlertCircle, Mail, Phone, MapPin, Shield } from 'lucide-react'
+import { breadcrumb } from '@/constants/breadcrumb'
 
 export const Route = createFileRoute('/_protected/users/$userId')({
   component: RouteComponent,
@@ -14,32 +14,18 @@ export const Route = createFileRoute('/_protected/users/$userId')({
 
 function RouteComponent() {
   const { userId } = Route.useParams()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
   const setBreadcrumbs = useBreadcrumbStore((state) => state.setBreadcrumbs)
+  const { data: user, isLoading: loading, error }= useGetUser(userId)
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        setLoading(true)
-        setError(null)
-        const userData = await userService.get(userId)
-        setUser(userData)
-        // Establecer breadcrumbs con el nombre del usuario
-        setBreadcrumbs([
-          { label: 'Usuarios', path: '/users' },
-          { label: userData.name, path: `/users/${userId}` }
-        ])
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Error al cargar el usuario')
-      } finally {
-        setLoading(false)
-      }
+    if (user) {
+      const { label, path } = breadcrumb.user(userId, user.name)
+      setBreadcrumbs([
+        { label: breadcrumb.users.label, path: breadcrumb.users.path },
+        { label, path }
+      ])
     }
-
-    fetchUser()
-  }, [userId, setBreadcrumbs])
+  }, [user, userId, setBreadcrumbs])
 
   if (loading) {
     return (
@@ -63,7 +49,7 @@ function RouteComponent() {
     return (
       <Alert variant="destructive">
         <AlertCircle className="h-4 w-4" />
-        <AlertDescription>{error}</AlertDescription>
+        <AlertDescription>{error instanceof Error ? error.message : 'Error al cargar el usuario'}</AlertDescription>
       </Alert>
     )
   }

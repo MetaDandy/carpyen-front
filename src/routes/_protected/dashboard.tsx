@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { useAuthStore } from '@/store/auth'
 import { BarChart3, CheckSquare2, FolderOpen, Users } from 'lucide-react'
 
 export const Route = createFileRoute('/_protected/dashboard')({
@@ -9,7 +8,6 @@ export const Route = createFileRoute('/_protected/dashboard')({
 })
 
 function Dashboard() {
-  const logout = useAuthStore((state) => state.logout)
 
   return (
     <div className="flex flex-col gap-8 p-8">
@@ -18,9 +16,6 @@ function Dashboard() {
           <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
           <p className="text-muted-foreground mt-1">Bienvenido a Carpyen</p>
         </div>
-        <Button variant="outline" onClick={logout}>
-          Cerrar sesión
-        </Button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">

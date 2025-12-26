@@ -1,14 +1,11 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery } from '@tanstack/react-query'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
 import { useTableFilters } from '@/hooks/use-table-filters'
 import { useAppStore } from '@/store/app'
-import userService from '@/services/user/user.service'
-import { createQueryParams } from '@/services/pagination.schema'
 import type { User } from '@/services/user/user.schema'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 import UserForm from '@/components/users/user.form'
@@ -18,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { useQueryUser } from '@/hooks/users/useQuery.user'
 
 export const Route = createFileRoute('/_protected/users/')({
   component: Users,
@@ -43,12 +41,11 @@ function Users() {
     ])
   }, [setBreadcrumbs])
 
-  const { data, isLoading } = useQuery({
-    queryKey: ['users', offset, limit, searchQuery, searchField],
-    queryFn: () => userService.getAll(createQueryParams(offset, limit, {
-      search: searchQuery,
-      search_field: searchField,
-    })),
+  const { data, isLoading } = useQueryUser({
+    offset,
+    limit,
+    search: searchQuery,
+    search_field: searchField,
   })
 
   // Función para abrir el diálogo de crear usuario

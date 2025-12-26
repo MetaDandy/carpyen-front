@@ -5,6 +5,7 @@ import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { breadcrumb } from '@/constants/breadcrumb'
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
@@ -32,7 +33,9 @@ function ProtectedLayout() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href="/dashboard">Dashboard</BreadcrumbLink>
+                  <BreadcrumbLink href={breadcrumb.dashboard.path}>
+                    {breadcrumb.dashboard.label}
+                  </BreadcrumbLink>
                 </BreadcrumbItem>
 
                 {breadcrumbs.map(({ label, path }, index) => (
