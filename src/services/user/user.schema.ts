@@ -18,7 +18,7 @@ const UserSchema = z.object({
 
 type User = z.infer<typeof UserSchema>;
 
-const CreateSchema = z.object({
+const CreateUserSchema = z.object({
     name: z.string().min(1, { message: "El nombre es requerido" }),
     email: z.email({ message: "El email no es válido" }),
     phone: z.string().optional(),
@@ -31,17 +31,9 @@ const CreateSchema = z.object({
     path: ["confirm_password"],
 });
 
-type Create = z.infer<typeof CreateSchema>;
+type CreateUser = z.infer<typeof CreateUserSchema>;
 
-const UpdateSchema = z.object({
-    name: z.string().optional(),
-    email: z.email().optional(),
-    phone: z.string().optional(),
-    address: z.string().optional(),
-    password: z.string().min(6).optional(),
-    confirm_password: z.string().min(6).optional(),
-    role: z.string().optional(),
-}).refine((data) => {
+const UpdateUserSchema = CreateUserSchema.partial().refine((data) => {
     if (data.password && data.confirm_password) {
         return data.password === data.confirm_password;
     }
@@ -51,16 +43,16 @@ const UpdateSchema = z.object({
     path: ["confirm_password"],
 });
 
-type Update = z.infer<typeof UpdateSchema>;
+type UpdateUser = z.infer<typeof UpdateUserSchema>;
 
-const UpdateProfileSchema = z.object({
+const UpdateUserProfileSchema = z.object({
     name: z.string().optional(),
     phone: z.string().optional(),
     address: z.string().optional(),
     email: z.email().optional(),
 });
 
-type UpdateProfile = z.infer<typeof UpdateProfileSchema>;
+type UpdateUserProfile = z.infer<typeof UpdateUserProfileSchema>;
 
 const UserListSchema = z.array(UserSchema);
 
@@ -69,17 +61,17 @@ type UserList = z.infer<typeof UserListSchema>;
 export {
     LoginSchema,
     UserSchema,
-    CreateSchema,
-    UpdateSchema,
-    UpdateProfileSchema,
+    CreateUserSchema,
+    UpdateUserSchema,
+    UpdateUserProfileSchema,
     UserListSchema,
 }
 
 export type {
     Login,
     User,
-    Create,
-    Update,
-    UpdateProfile,
+    CreateUser,
+    UpdateUser,
+    UpdateUserProfile,
     UserList,
 }

@@ -11,10 +11,8 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react'
 
-export function GenericDialog() {
-  const dialogs = useAppStore((state) => state.dialogs)
-  const closeDialog = useAppStore((state) => state.closeDialog)
-  const updateDialog = useAppStore((state) => state.updateDialog)
+export function DialogCore() {
+  const { dialogs, closeDialog, updateDialog } = useAppStore()
 
   if (dialogs.length === 0) return null
 
@@ -43,7 +41,7 @@ export function GenericDialog() {
         }
       }}
     >
-      <DialogContent className="w-[95vw] max-w-2xl max-h-[80vh] flex flex-col">
+      <DialogContent className="w-[95vw] max-w-2xl h-[80vh] flex flex-col p-0 gap-0">
         <DialogHeader className="shrink-0 border-b px-6 py-4">
           <DialogTitle>{dialog.title}</DialogTitle>
           {dialog.description && (
@@ -52,7 +50,7 @@ export function GenericDialog() {
         </DialogHeader>
 
         {dialog.content && (
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 overflow-hidden">
             <div className="px-6 py-4">{dialog.content}</div>
           </ScrollArea>
         )}

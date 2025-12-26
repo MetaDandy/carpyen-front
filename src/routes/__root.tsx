@@ -1,4 +1,4 @@
-import { DialogProvider } from '@/components/core/dialog-provider';
+import { DialogCore } from '@/components/core/dialog.core';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { Toaster } from 'sonner'
@@ -24,7 +24,7 @@ export const Route = createRootRoute({
         <main className="flex-1">
           <Outlet />
         </main>
-        <DialogProvider />
+        <DialogCore />
         <Toaster />
       </div>
     </QueryClientProvider>

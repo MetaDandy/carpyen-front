@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 import { type ColumnDef } from '@tanstack/react-table'
 import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
@@ -9,9 +9,8 @@ import { useTableFilters } from '@/hooks/use-table-filters'
 import { useAppStore } from '@/store/app'
 import userService from '@/services/user/user.service'
 import { createQueryParams } from '@/services/pagination.schema'
-import type { User, Create, Update } from '@/services/user/user.schema'
+import type { User } from '@/services/user/user.schema'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
-import { toast } from 'sonner'
 import UserForm from '@/components/users/user.form'
 import {
   DropdownMenu,
@@ -25,7 +24,6 @@ export const Route = createFileRoute('/_protected/users/')({
 })
 
 function Users() {
-  const queryClient = useQueryClient()
   const { 
     page, 
     limit, 
@@ -37,7 +35,7 @@ function Users() {
     setSearchField 
   } = useTableFilters({ initialSearchField: 'name' })
   const { setBreadcrumbs } = useBreadcrumbStore()
-  const { openDialog } = useAppStore()
+  const { openDialog, updateDialog } = useAppStore()
 
   useEffect(() => {
     setBreadcrumbs([
@@ -53,66 +51,31 @@ function Users() {
     })),
   })
 
-  // Mutación para crear usuario
-  const createMutation = useMutation({
-    mutationFn: (data: Create) => userService.create(data),
-    onSuccess: () => {
-      toast.success('Usuario creado exitosamente')
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al crear usuario')
-    },
-  })
-
-  // Mutación para actualizar usuario
-  const updateMutation = useMutation({
-    mutationFn: ({ id, data }: { id: string; data: Update }) =>
-      userService.update(id, data),
-    onSuccess: () => {
-      toast.success('Usuario actualizado exitosamente')
-      queryClient.invalidateQueries({ queryKey: ['users'] })
-    },
-    onError: (error) => {
-      toast.error(error instanceof Error ? error.message : 'Error al actualizar usuario')
-    },
-  })
+  console.log('Usuarios cargados:', data)
 
   // Función para abrir el diálogo de crear usuario
   const handleOpenCreateDialog = () => {
-    openDialog({
+    const dialogId = openDialog({
       title: 'Crear Nuevo Usuario',
-      content: (
-        <UserForm
-          onSubmit={async (formData) => {
-            await createMutation.mutateAsync(formData as Create)
-          }}
-          isLoading={createMutation.isPending}
-        />
-      ),
+      content: null,
       confirmText: undefined,
       cancelText: 'Cerrar',
+    })
+    updateDialog(dialogId, {
+      content: <UserForm dialogId={dialogId} />,
     })
   }
 
   // Función para abrir el diálogo de editar usuario
   const handleOpenEditDialog = (user: User) => {
-    openDialog({
+    const dialogId = openDialog({
       title: 'Editar Usuario',
-      content: (
-        <UserForm
-          user={user}
-          onSubmit={async (formData) => {
-            await updateMutation.mutateAsync({
-              id: user.id,
-              data: formData as Update,
-            })
-          }}
-          isLoading={updateMutation.isPending}
-        />
-      ),
+      content: null,
       confirmText: undefined,
       cancelText: 'Cerrar',
+    })
+    updateDialog(dialogId, {
+      content: <UserForm user={user} dialogId={dialogId} />,
     })
   }
 

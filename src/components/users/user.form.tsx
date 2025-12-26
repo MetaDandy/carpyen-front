@@ -1,8 +1,9 @@
 import { useForm } from '@tanstack/react-form'
-import type { User, Create, Update } from '@/services/user/user.schema'
-import { CreateSchema, UpdateSchema } from '@/services/user/user.schema'
+import { CreateUserSchema, UpdateUserSchema, type User } from '@/services/user/user.schema'
+import { useCreateUserMutation, useUpdateUserMutation } from '@/hooks/users/useMutation.user'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { toast } from 'sonner'
 import {
   Select,
   SelectContent,
@@ -13,38 +14,79 @@ import {
 
 interface UserFormProps {
   user?: User
-  onSubmit: (data: Create | Update) => Promise<void>
-  isLoading?: boolean
+  dialogId?: string
 }
 
-export default function UserForm({ user, onSubmit, isLoading = false }: UserFormProps) {
+export default function UserForm({ user, dialogId }: UserFormProps) {
   const isEditing = !!user
-  const schema = isEditing ? UpdateSchema : CreateSchema
+  const mutation = isEditing 
+    ? useUpdateUserMutation(user.id, { dialogId }) 
+    : useCreateUserMutation({ dialogId })
+  const schema = isEditing ? UpdateUserSchema : CreateUserSchema
+
+  const defaultValues = isEditing
+    ? {
+        name: user.name,
+        email: user.email,
+        phone: user.phone || '',
+        address: user.address || '',
+        role: user.role,
+      }
+    : {
+        name: '',
+        email: '',
+        phone: '',
+        address: '',
+        password: '',
+        confirm_password: '',
+        role: '',
+      }
 
   const form = useForm({
-    defaultValues: isEditing
-      ? {
-          name: user.name,
-          email: user.email,
-          phone: user.phone || '',
-          address: user.address || '',
-          role: user.role,
-        }
-      : {
-          name: '',
-          email: '',
-          phone: '',
-          address: '',
-          password: '',
-          confirm_password: '',
-          role: '',
-        },
+    defaultValues,
     onSubmit: async (values) => {
-      const result = schema.safeParse(values.value)
-      if (!result.success) {
-        throw new Error('Validación fallida')
+      let dataToSubmit: any = values.value
+
+      // Si es edición, solo enviar campos modificados
+      if (isEditing) {
+        const dirtyFields: Record<string, any> = {}
+        let hasDirtyFields = false
+
+        Object.entries(dataToSubmit).forEach(([key, value]) => {
+          if (value !== defaultValues[key as keyof typeof defaultValues]) {
+            dirtyFields[key] = value
+            hasDirtyFields = true
+          }
+        })
+
+        // Si no hay cambios, no enviar
+        if (!hasDirtyFields) {
+          toast.error('No hay cambios para guardar')
+          return
+        }
+
+        dataToSubmit = dirtyFields
       }
-      await onSubmit(result.data as Create | Update)
+
+      const result = schema.safeParse(dataToSubmit)
+      if (!result.success) {
+        toast.error('Validación fallida')
+        return
+      }
+
+      if (isEditing) {
+        toast.promise(mutation.mutateAsync(dataToSubmit), {
+          loading: 'Actualizando usuario...',
+          success: 'Usuario actualizado exitosamente',
+          error: (err) => (err as Error).message || 'Error al actualizar usuario',
+        })
+      } else {
+        toast.promise(mutation.mutateAsync(dataToSubmit), {
+          loading: 'Creando usuario...',
+          success: 'Usuario creado exitosamente',
+          error: (err) => (err as Error).message || 'Error al crear usuario',
+        })
+      }
     },
   })
 
@@ -79,7 +121,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Juan Pérez"
-              disabled={isLoading}
+              disabled={mutation.isPending}
             />
             {field.state.meta.errors?.length > 0 && (
               <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -111,7 +153,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="juan@example.com"
-              disabled={isLoading}
+              disabled={mutation.isPending}
             />
             {field.state.meta.errors?.length > 0 && (
               <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -135,7 +177,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="+591 712345678"
-              disabled={isLoading}
+              disabled={mutation.isPending}
             />
             {field.state.meta.errors?.length > 0 && (
               <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -159,7 +201,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
               onBlur={field.handleBlur}
               onChange={(e) => field.handleChange(e.target.value)}
               placeholder="Calle Principal 123"
-              disabled={isLoading}
+              disabled={mutation.isPending}
             />
             {field.state.meta.errors?.length > 0 && (
               <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -185,7 +227,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
             <Select
               value={field.state.value}
               onValueChange={field.handleChange}
-              disabled={isLoading}
+              disabled={mutation.isPending}
             >
               <SelectTrigger id={field.name}>
                 <SelectValue placeholder="Selecciona un rol" />
@@ -230,7 +272,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="••••••••"
-                  disabled={isLoading}
+                  disabled={mutation.isPending}
                 />
                 {field.state.meta.errors?.length > 0 && (
                   <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -260,7 +302,7 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
                   onBlur={field.handleBlur}
                   onChange={(e) => field.handleChange(e.target.value)}
                   placeholder="••••••••"
-                  disabled={isLoading}
+                  disabled={mutation.isPending}
                 />
                 {field.state.meta.errors?.length > 0 && (
                   <p className="text-sm text-destructive mt-1">{field.state.meta.errors[0]}</p>
@@ -271,8 +313,8 @@ export default function UserForm({ user, onSubmit, isLoading = false }: UserForm
         </>
       )}
 
-      <Button type="submit" disabled={isLoading} className="w-full">
-        {isLoading ? 'Guardando...' : isEditing ? 'Actualizar Usuario' : 'Crear Usuario'}
+      <Button type="submit" disabled={mutation.isPending} className="w-full">
+        {isEditing ? 'Actualizar Usuario' : 'Crear Usuario'}
       </Button>
     </form>
   )
