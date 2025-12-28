@@ -11,25 +11,25 @@ export interface DialogConfig {
   onCancel?: () => void
   isDestructive?: boolean
   isLoading?: boolean
+  width?: string  // Clase Tailwind como 'max-w-4xl', 'max-w-2xl', etc
 }
 
 interface AppStore {
   dialogs: DialogConfig[]
-  openDialog: (dialog: Omit<DialogConfig, 'id'>) => string
+  openDialog: (dialog: DialogConfig) => void
   closeDialog: (id: string) => void
-  closeAllDialogs: () => void
   updateDialog: (id: string, updates: Partial<DialogConfig>) => void
+  closeAllDialogs: () => void
 }
 
 export const useAppStore = create<AppStore>((set) => ({
   dialogs: [],
 
   openDialog: (dialog) => {
-    const id = `dialog-${Date.now()}-${Math.random()}`
     set((state) => ({
-      dialogs: [...state.dialogs, { ...dialog, id }],
+      dialogs: [dialog, ...state.dialogs],
     }))
-    return id
+    return dialog.id
   },
 
   closeDialog: (id) => {
@@ -38,15 +38,15 @@ export const useAppStore = create<AppStore>((set) => ({
     }))
   },
 
-  closeAllDialogs: () => {
-    set({ dialogs: [] })
-  },
-
   updateDialog: (id, updates) => {
     set((state) => ({
       dialogs: state.dialogs.map((d) =>
         d.id === id ? { ...d, ...updates } : d
       ),
     }))
+  },
+
+  closeAllDialogs: () => {
+    set({ dialogs: [] })
   },
 }))
