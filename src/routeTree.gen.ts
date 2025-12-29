@@ -13,6 +13,7 @@ import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedUsersIndexRouteImport } from './routes/_protected/users/index'
+import { Route as ProtectedSupplierIndexRouteImport } from './routes/_protected/supplier/index'
 import { Route as ProtectedClientIndexRouteImport } from './routes/_protected/client/index'
 import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users/$userId'
 import { Route as ProtectedClientClientIdRouteImport } from './routes/_protected/client/$clientId'
@@ -34,6 +35,11 @@ const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
 const ProtectedUsersIndexRoute = ProtectedUsersIndexRouteImport.update({
   id: '/users/',
   path: '/users/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedSupplierIndexRoute = ProtectedSupplierIndexRouteImport.update({
+  id: '/supplier/',
+  path: '/supplier/',
   getParentRoute: () => ProtectedRoute,
 } as any)
 const ProtectedClientIndexRoute = ProtectedClientIndexRouteImport.update({
@@ -58,6 +64,7 @@ export interface FileRoutesByFullPath {
   '/client/$clientId': typeof ProtectedClientClientIdRoute
   '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/client': typeof ProtectedClientIndexRoute
+  '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
 }
 export interface FileRoutesByTo {
@@ -66,6 +73,7 @@ export interface FileRoutesByTo {
   '/client/$clientId': typeof ProtectedClientClientIdRoute
   '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/client': typeof ProtectedClientIndexRoute
+  '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
 }
 export interface FileRoutesById {
@@ -76,6 +84,7 @@ export interface FileRoutesById {
   '/_protected/client/$clientId': typeof ProtectedClientClientIdRoute
   '/_protected/users/$userId': typeof ProtectedUsersUserIdRoute
   '/_protected/client/': typeof ProtectedClientIndexRoute
+  '/_protected/supplier/': typeof ProtectedSupplierIndexRoute
   '/_protected/users/': typeof ProtectedUsersIndexRoute
 }
 export interface FileRouteTypes {
@@ -86,6 +95,7 @@ export interface FileRouteTypes {
     | '/client/$clientId'
     | '/users/$userId'
     | '/client'
+    | '/supplier'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -94,6 +104,7 @@ export interface FileRouteTypes {
     | '/client/$clientId'
     | '/users/$userId'
     | '/client'
+    | '/supplier'
     | '/users'
   id:
     | '__root__'
@@ -103,6 +114,7 @@ export interface FileRouteTypes {
     | '/_protected/client/$clientId'
     | '/_protected/users/$userId'
     | '/_protected/client/'
+    | '/_protected/supplier/'
     | '/_protected/users/'
   fileRoutesById: FileRoutesById
 }
@@ -141,6 +153,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedUsersIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/supplier/': {
+      id: '/_protected/supplier/'
+      path: '/supplier'
+      fullPath: '/supplier'
+      preLoaderRoute: typeof ProtectedSupplierIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/client/': {
       id: '/_protected/client/'
       path: '/client'
@@ -170,6 +189,7 @@ interface ProtectedRouteChildren {
   ProtectedClientClientIdRoute: typeof ProtectedClientClientIdRoute
   ProtectedUsersUserIdRoute: typeof ProtectedUsersUserIdRoute
   ProtectedClientIndexRoute: typeof ProtectedClientIndexRoute
+  ProtectedSupplierIndexRoute: typeof ProtectedSupplierIndexRoute
   ProtectedUsersIndexRoute: typeof ProtectedUsersIndexRoute
 }
 
@@ -178,6 +198,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedClientClientIdRoute: ProtectedClientClientIdRoute,
   ProtectedUsersUserIdRoute: ProtectedUsersUserIdRoute,
   ProtectedClientIndexRoute: ProtectedClientIndexRoute,
+  ProtectedSupplierIndexRoute: ProtectedSupplierIndexRoute,
   ProtectedUsersIndexRoute: ProtectedUsersIndexRoute,
 }
 
