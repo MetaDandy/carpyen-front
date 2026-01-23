@@ -1,20 +1,21 @@
-import { create } from 'zustand'
+import { create } from "zustand"
 
 export interface DialogConfig {
-  id: string
-  title: string
-  description?: string
-  content?: React.ReactNode
-  confirmText?: string
-  cancelText?: string
-  onConfirm?: () => void | Promise<void>
-  onCancel?: () => void
-  isDestructive?: boolean
-  isLoading?: boolean
-  width?: string  // Clase Tailwind como 'max-w-4xl', 'max-w-2xl', etc
+  id: string;
+  title: string;
+  description?: string;
+  content?: React.ReactNode;
+  confirmText?: string;
+  cancelText?: string;
+  onConfirm?: () => void | Promise<void>;
+  onCancel?: () => void;
+  isDestructive?: boolean;
+  isLoading?: boolean;
+  width?: string; // Clase Tailwind como 'max-w-4xl', 'max-w-2xl', etc
+  closeable?: boolean;
 }
 
-interface AppStore {
+interface DialogStore {
   dialogs: DialogConfig[]
   openDialog: (dialog: DialogConfig) => void
   closeDialog: (id: string) => void
@@ -22,7 +23,7 @@ interface AppStore {
   closeAllDialogs: () => void
 }
 
-export const useAppStore = create<AppStore>((set) => ({
+export const useDialogStore = create<DialogStore>((set) => ({
   dialogs: [],
 
   openDialog: (dialog) => {

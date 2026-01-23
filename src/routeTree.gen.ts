@@ -14,6 +14,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProtectedDashboardRouteImport } from './routes/_protected/dashboard'
 import { Route as ProtectedUsersIndexRouteImport } from './routes/_protected/users/index'
 import { Route as ProtectedSupplierIndexRouteImport } from './routes/_protected/supplier/index'
+import { Route as ProtectedInventoryIndexRouteImport } from './routes/_protected/inventory/index'
 import { Route as ProtectedClientIndexRouteImport } from './routes/_protected/client/index'
 import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users/$userId'
 import { Route as ProtectedClientClientIdRouteImport } from './routes/_protected/client/$clientId'
@@ -42,6 +43,11 @@ const ProtectedSupplierIndexRoute = ProtectedSupplierIndexRouteImport.update({
   path: '/supplier/',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedInventoryIndexRoute = ProtectedInventoryIndexRouteImport.update({
+  id: '/inventory/',
+  path: '/inventory/',
+  getParentRoute: () => ProtectedRoute,
+} as any)
 const ProtectedClientIndexRoute = ProtectedClientIndexRouteImport.update({
   id: '/client/',
   path: '/client/',
@@ -64,6 +70,7 @@ export interface FileRoutesByFullPath {
   '/client/$clientId': typeof ProtectedClientClientIdRoute
   '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/client': typeof ProtectedClientIndexRoute
+  '/inventory': typeof ProtectedInventoryIndexRoute
   '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
 }
@@ -73,6 +80,7 @@ export interface FileRoutesByTo {
   '/client/$clientId': typeof ProtectedClientClientIdRoute
   '/users/$userId': typeof ProtectedUsersUserIdRoute
   '/client': typeof ProtectedClientIndexRoute
+  '/inventory': typeof ProtectedInventoryIndexRoute
   '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
 }
@@ -84,6 +92,7 @@ export interface FileRoutesById {
   '/_protected/client/$clientId': typeof ProtectedClientClientIdRoute
   '/_protected/users/$userId': typeof ProtectedUsersUserIdRoute
   '/_protected/client/': typeof ProtectedClientIndexRoute
+  '/_protected/inventory/': typeof ProtectedInventoryIndexRoute
   '/_protected/supplier/': typeof ProtectedSupplierIndexRoute
   '/_protected/users/': typeof ProtectedUsersIndexRoute
 }
@@ -95,6 +104,7 @@ export interface FileRouteTypes {
     | '/client/$clientId'
     | '/users/$userId'
     | '/client'
+    | '/inventory'
     | '/supplier'
     | '/users'
   fileRoutesByTo: FileRoutesByTo
@@ -104,6 +114,7 @@ export interface FileRouteTypes {
     | '/client/$clientId'
     | '/users/$userId'
     | '/client'
+    | '/inventory'
     | '/supplier'
     | '/users'
   id:
@@ -114,6 +125,7 @@ export interface FileRouteTypes {
     | '/_protected/client/$clientId'
     | '/_protected/users/$userId'
     | '/_protected/client/'
+    | '/_protected/inventory/'
     | '/_protected/supplier/'
     | '/_protected/users/'
   fileRoutesById: FileRoutesById
@@ -160,6 +172,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedSupplierIndexRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/inventory/': {
+      id: '/_protected/inventory/'
+      path: '/inventory'
+      fullPath: '/inventory'
+      preLoaderRoute: typeof ProtectedInventoryIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/client/': {
       id: '/_protected/client/'
       path: '/client'
@@ -189,6 +208,7 @@ interface ProtectedRouteChildren {
   ProtectedClientClientIdRoute: typeof ProtectedClientClientIdRoute
   ProtectedUsersUserIdRoute: typeof ProtectedUsersUserIdRoute
   ProtectedClientIndexRoute: typeof ProtectedClientIndexRoute
+  ProtectedInventoryIndexRoute: typeof ProtectedInventoryIndexRoute
   ProtectedSupplierIndexRoute: typeof ProtectedSupplierIndexRoute
   ProtectedUsersIndexRoute: typeof ProtectedUsersIndexRoute
 }
@@ -198,6 +218,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedClientClientIdRoute: ProtectedClientClientIdRoute,
   ProtectedUsersUserIdRoute: ProtectedUsersUserIdRoute,
   ProtectedClientIndexRoute: ProtectedClientIndexRoute,
+  ProtectedInventoryIndexRoute: ProtectedInventoryIndexRoute,
   ProtectedSupplierIndexRoute: ProtectedSupplierIndexRoute,
   ProtectedUsersIndexRoute: ProtectedUsersIndexRoute,
 }

@@ -1,4 +1,4 @@
-import { useAppStore, type DialogConfig } from '@/store/app'
+import { useDialogStore, type DialogConfig } from '@/store/dialog.store'
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import { Loader2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 
 export function DialogCore() {
-  const { dialogs, closeDialog, updateDialog } = useAppStore()
+  const { dialogs, closeDialog, updateDialog } = useDialogStore()
 
   if (dialogs.length === 0) return null
 

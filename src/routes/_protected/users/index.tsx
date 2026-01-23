@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button'
 import { DataTable } from '@/components/table/data-table'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
 import { useTableFilters } from '@/hooks/use-table-filters'
-import { useAppStore } from '@/store/app'
+import { useDialogStore } from '@/store/dialog.store'
 import type { User } from '@/services/user/user.schema'
 import { ArrowUpDown, MoreHorizontal } from 'lucide-react'
 import UserForm from '@/components/users/user.form'
@@ -33,7 +33,7 @@ function Users() {
     setSearchField 
   } = useTableFilters({ initialSearchField: 'name' })
   const { setBreadcrumbs } = useBreadcrumbStore()
-  const { openDialog } = useAppStore()
+  const { openDialog } = useDialogStore()
 
   useEffect(() => {
     setBreadcrumbs([

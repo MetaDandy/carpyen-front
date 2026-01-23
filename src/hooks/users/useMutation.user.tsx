@@ -1,14 +1,14 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import userService from '@/services/user/user.service'
 import type { CreateUser, UpdateUser } from '@/services/user/user.schema'
-import { useAppStore } from '@/store/app'
+import { useDialogStore } from '@/store/dialog.store'
 import type { QueryMutationOptions } from '@/types/mutation-options'
 import { querykey } from '@/constants/querykey'
 
 
 export function useCreateUserMutation(options?: QueryMutationOptions) {
     const queryClient = useQueryClient()
-    const closeDialog = useAppStore((state) => state.closeDialog)
+    const closeDialog = useDialogStore((state) => state.closeDialog)
 
     return useMutation({
         mutationFn: (data: CreateUser) => userService.create(data),
@@ -23,7 +23,7 @@ export function useCreateUserMutation(options?: QueryMutationOptions) {
 
 export function useUpdateUserMutation(userId: string, options?: QueryMutationOptions) {
     const queryClient = useQueryClient()
-    const closeDialog = useAppStore((state) => state.closeDialog)
+    const closeDialog = useDialogStore((state) => state.closeDialog)
 
     return useMutation({
         mutationFn: (data: UpdateUser) => userService.update(userId, data),
