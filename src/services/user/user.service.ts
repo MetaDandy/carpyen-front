@@ -72,7 +72,7 @@ class UserService {
             if (axios.isAxiosError(error)) {
                 throw new Error(error.response?.data?.message || 'Error al actualizar el usuario')
             }
-            throw new Error('Error al actualizar el usuario')
+            throw new Error(`Error al actualizar el usuario ${error}`)
         }
     }
 

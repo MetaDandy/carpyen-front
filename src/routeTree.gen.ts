@@ -18,6 +18,7 @@ import { Route as ProtectedInventoryIndexRouteImport } from './routes/_protected
 import { Route as ProtectedClientIndexRouteImport } from './routes/_protected/client/index'
 import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users/$userId'
 import { Route as ProtectedClientClientIdRouteImport } from './routes/_protected/client/$clientId'
+import { Route as ProtectedInventoryProductsIndexRouteImport } from './routes/_protected/inventory/products/index'
 
 const ProtectedRoute = ProtectedRouteImport.update({
   id: '/_protected',
@@ -63,6 +64,12 @@ const ProtectedClientClientIdRoute = ProtectedClientClientIdRouteImport.update({
   path: '/client/$clientId',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedInventoryProductsIndexRoute =
+  ProtectedInventoryProductsIndexRouteImport.update({
+    id: '/inventory/products/',
+    path: '/inventory/products/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -73,6 +80,7 @@ export interface FileRoutesByFullPath {
   '/inventory': typeof ProtectedInventoryIndexRoute
   '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
+  '/inventory/products': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -83,6 +91,7 @@ export interface FileRoutesByTo {
   '/inventory': typeof ProtectedInventoryIndexRoute
   '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
+  '/inventory/products': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -95,6 +104,7 @@ export interface FileRoutesById {
   '/_protected/inventory/': typeof ProtectedInventoryIndexRoute
   '/_protected/supplier/': typeof ProtectedSupplierIndexRoute
   '/_protected/users/': typeof ProtectedUsersIndexRoute
+  '/_protected/inventory/products/': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/supplier'
     | '/users'
+    | '/inventory/products'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/inventory'
     | '/supplier'
     | '/users'
+    | '/inventory/products'
   id:
     | '__root__'
     | '/'
@@ -128,6 +140,7 @@ export interface FileRouteTypes {
     | '/_protected/inventory/'
     | '/_protected/supplier/'
     | '/_protected/users/'
+    | '/_protected/inventory/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -200,6 +213,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedClientClientIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/inventory/products/': {
+      id: '/_protected/inventory/products/'
+      path: '/inventory/products'
+      fullPath: '/inventory/products'
+      preLoaderRoute: typeof ProtectedInventoryProductsIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
   }
 }
 
@@ -211,6 +231,7 @@ interface ProtectedRouteChildren {
   ProtectedInventoryIndexRoute: typeof ProtectedInventoryIndexRoute
   ProtectedSupplierIndexRoute: typeof ProtectedSupplierIndexRoute
   ProtectedUsersIndexRoute: typeof ProtectedUsersIndexRoute
+  ProtectedInventoryProductsIndexRoute: typeof ProtectedInventoryProductsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
@@ -221,6 +242,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedInventoryIndexRoute: ProtectedInventoryIndexRoute,
   ProtectedSupplierIndexRoute: ProtectedSupplierIndexRoute,
   ProtectedUsersIndexRoute: ProtectedUsersIndexRoute,
+  ProtectedInventoryProductsIndexRoute: ProtectedInventoryProductsIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(

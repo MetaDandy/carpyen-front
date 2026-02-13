@@ -34,5 +34,8 @@ export function useUpdateUserMutation(userId: string, options?: QueryMutationOpt
                 closeDialog(options.dialogId)
             }
         },
+        onError: (error) => {
+            console.error('Error updating user:', error)
+        }
     })
 }
