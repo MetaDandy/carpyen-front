@@ -1,3 +1,4 @@
+import ProductForm from '@/components/modules/inventory/product/form.product'
 import { DataTable } from '@/components/table/data-table'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -6,6 +7,7 @@ import { useGetAllProducts } from '@/hooks/modules/inventory/product/useQuery.pr
 import { useTableFilters } from '@/hooks/use-table-filters'
 import type { Product } from '@/services/inventory/product/product.schema'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
+import { useDialogStore } from '@/store/dialog.store'
 import { createFileRoute } from '@tanstack/react-router'
 import type { ColumnDef } from '@tanstack/react-table'
 import { MoreHorizontal } from 'lucide-react'
@@ -27,6 +29,7 @@ function RouteComponent() {
     setSearchField
   } = useTableFilters({ initialSearchField: 'name' })
   const setBreadcrumbs = useBreadcrumbStore((state) => state.setBreadcrumbs)
+  const { openDialog } = useDialogStore();
 
   useEffect(() => {
     setBreadcrumbs([
@@ -67,7 +70,7 @@ function RouteComponent() {
       id: 'actions',
       header: 'Acciones',
       cell: ({ row }) => {
-        const user = row.original
+        const product = row.original
 
         return (
           <DropdownMenu>
@@ -79,15 +82,13 @@ function RouteComponent() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  console.log('Ver detalles del producto', user.id)
+                  console.log('Ver detalles del producto', product.id)
                 }}
               >
                 Ver detalles
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={() => {
-                  console.log('Editar producto', user.id)
-                }}
+                onClick={() => handleUpdate(product)}
               >
                 Editar
               </DropdownMenuItem>
@@ -96,7 +97,27 @@ function RouteComponent() {
         )
       },
     },
-  ]
+  ];
+
+  const handleCreate = () => {
+    const dialogId = "create-product-dialog";
+    openDialog({
+      id: dialogId,
+      title: "Crear Producto",
+      description: "Completa los detalles del nuevo producto.",
+      content: <ProductForm id={dialogId} />,
+    })
+  }
+
+  const handleUpdate = (product: Product) => {
+    const dialogId = `update-product-dialog-${product.id}`;
+    openDialog({
+      id: dialogId,
+      title: "Editar Producto",
+      description: "Actualiza los detalles del producto.",
+      content: <ProductForm id={dialogId} product={product} />,
+    })
+  }
 
   return (
     <div className="flex flex-col gap-8 p-8">
@@ -105,7 +126,7 @@ function RouteComponent() {
           <h1 className="text-3xl font-bold tracking-tight">Productos</h1>
           <p className="text-muted-foreground mt-1">Gestiona los productos del sistema</p>
         </div>
-        <Button onClick={()=> console.log('Nuevo Producto')}>Nuevo Producto</Button>
+        <Button onClick={handleCreate}>Nuevo Producto</Button>
       </div>
 
       <DataTable

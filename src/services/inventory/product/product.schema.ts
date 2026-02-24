@@ -3,9 +3,12 @@ import z from "zod";
 
 const ProductSchema = z.object({
     id: z.string(),
-	name: z.string(),
-	type: z.string(),
-	unit_price: z.string(),
+	name: z.string().min(1, 'El nombre es requerido'),
+	type: z.string().min(1, 'El tipo es requerido'),
+	unit_price: z.string().min(1, 'El precio unitario es requerido').refine(
+		(val) => !isNaN(parseFloat(val)),
+		'El precio debe ser un número válido'
+	),
 	user: UserSchema,
 })
 
