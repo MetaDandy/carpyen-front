@@ -21,15 +21,15 @@ export function useMutationCreateMaterial(options?: QueryMutationOptions) {
     });
 }
 
-export function useUpdateMaterialrMutation(Id: string, options?: QueryMutationOptions) {
+export function useUpdateMaterialrMutation(materialId: string, options?: QueryMutationOptions) {
     const queryClient = useQueryClient()
     const closeDialog = useDialogStore((state) => state.closeDialog)
 
     return useMutation({
-        mutationFn: (data: UpdateMaterial) => materialService.update(Id, data),
+        mutationFn: ({id, data}: {id: string,data: UpdateMaterial}) => materialService.update(id, data),
         onSuccess: () => {
             queryClient.invalidateQueries({ queryKey: [querykey.inventory.materials] })
-            queryClient.invalidateQueries({ queryKey: [querykey.inventory.material, Id] })
+            queryClient.invalidateQueries({ queryKey: [querykey.inventory.material, materialId] })
             if (options?.dialogId) {
                 closeDialog(options.dialogId)
             }

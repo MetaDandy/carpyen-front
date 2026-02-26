@@ -3,11 +3,11 @@ import { z } from 'zod';
 
 
 const MaterialSchema = z.object({
-    id: z.string,
-    name: z.string,
-    type: z.string,
-    unit_measure: z.string,
-    unit_price: z.string,
+    id: z.string(),
+    name: z.string(),
+    type: z.string(),
+    unit_measure: z.string(),
+    unit_price: z.string(),
     User: UserSchema,
 })
 

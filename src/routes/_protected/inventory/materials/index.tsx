@@ -6,6 +6,7 @@ import { useGetAllMaterials } from '@/hooks/modules/inventory/material/useQuery.
 import { useTableFilters } from '@/hooks/use-table-filters'
 import type { Material } from '@/services/inventory/material/material.schema'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
+import { useDialogStore } from '@/store/dialog.store'
 import { createFileRoute } from '@tanstack/react-router'
 import { MoreHorizontal } from 'lucide-react'
 import type { ColumnDef } from 'node_modules/@tanstack/table-core/build/lib/types'
@@ -27,7 +28,7 @@ function RouteComponent() {
         setSearchField 
       } = useTableFilters({ initialSearchField: 'name' })
   const setBreadcrumbs = useBreadcrumbStore((state) => state.setBreadcrumbs)
-  
+  const { openDialog } = useDialogStore()
    const { data, isLoading } = useGetAllMaterials({
       offset,
       limit,
@@ -86,8 +87,17 @@ function RouteComponent() {
         )
       },
     },
-  ]
+  ];
 
+  const handleCreateMaterial = () => {
+    const dialogId = "create-material-dialog"
+    openDialog({
+      id: dialogId,
+      title: "Crear nuevo material",
+      description: "Completa el formulario para crear un nuevo material",
+      content: "contenido del diálogo de creación de material",
+    })
+  }
 
   useEffect(() => {
     setBreadcrumbs([
@@ -96,6 +106,7 @@ function RouteComponent() {
     ])
   }, [setBreadcrumbs])
   
+  
     return (
       <div className="flex flex-col gap-8 p-8">
           <div className="flex justify-between items-center">
@@ -103,7 +114,7 @@ function RouteComponent() {
               <h1 className="text-3xl font-bold tracking-tight">Materiales</h1>
               <p className="text-muted-foreground mt-1">Gestiona los materiales del sistema</p>
             </div>
-            <Button onClick={() => console.log("Nuevo Material")}>Nuevo Material</Button>
+            <Button onClick={handleCreateMaterial}>Nuevo Material</Button>
           </div>
     
           <DataTable
