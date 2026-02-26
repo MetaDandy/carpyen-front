@@ -1,3 +1,4 @@
+import MaterialForm from '@/components/modules/inventory/material/form.material'
 import { DataTable } from '@/components/table/data-table'
 import { Button } from '@/components/ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
@@ -57,7 +58,7 @@ function RouteComponent() {
       id: 'actions',
       header: 'Acciones',
       cell: ({ row }) => {
-        const user = row.original
+        const material = row.original
 
         return (
           <DropdownMenu>
@@ -69,14 +70,15 @@ function RouteComponent() {
             <DropdownMenuContent align="end">
               <DropdownMenuItem
                 onClick={() => {
-                  console.log("Ver detalles material", user.id)
+                  console.log("Ver detalles material", material.id)
                 }}
               >
                 Ver detalles
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => {
-                  console.log("Editar material", user.id)
+                  console.log("Editar material", material.id)
+                  handleUpdateMaterial(material)
                 }}
               >
                 Editar
@@ -95,7 +97,16 @@ function RouteComponent() {
       id: dialogId,
       title: "Crear nuevo material",
       description: "Completa el formulario para crear un nuevo material",
-      content: "contenido del diálogo de creación de material",
+      content: <MaterialForm id={dialogId} />,
+    })
+  }
+   const handleUpdateMaterial = (material: Material) => {
+    const dialogId = "update-material-dialog"
+    openDialog({
+      id: dialogId,
+      title: "Actualizar material",
+      description: "Completa el formulario para actualizar el material",
+      content: <MaterialForm id={dialogId} material={material} />,
     })
   }
 
