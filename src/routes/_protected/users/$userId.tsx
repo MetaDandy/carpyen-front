@@ -25,7 +25,7 @@ function RouteComponent() {
         { label, path }
       ])
     }
-  }, [user, userId, setBreadcrumbs])
+  }, [user, userId])
 
   if (loading) {
     return (

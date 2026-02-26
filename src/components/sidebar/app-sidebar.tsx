@@ -73,8 +73,8 @@ const data = {
           url: "/inventory/materials",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Productos",
+          url: "/inventory/products",
         },
         {
           title: "Quantum",

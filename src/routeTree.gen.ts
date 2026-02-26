@@ -18,6 +18,7 @@ import { Route as ProtectedInventoryIndexRouteImport } from './routes/_protected
 import { Route as ProtectedClientIndexRouteImport } from './routes/_protected/client/index'
 import { Route as ProtectedUsersUserIdRouteImport } from './routes/_protected/users/$userId'
 import { Route as ProtectedClientClientIdRouteImport } from './routes/_protected/client/$clientId'
+import { Route as ProtectedInventoryProductsIndexRouteImport } from './routes/_protected/inventory/products/index'
 import { Route as ProtectedInventoryMaterialsIndexRouteImport } from './routes/_protected/inventory/materials/index'
 
 const ProtectedRoute = ProtectedRouteImport.update({
@@ -64,6 +65,12 @@ const ProtectedClientClientIdRoute = ProtectedClientClientIdRouteImport.update({
   path: '/client/$clientId',
   getParentRoute: () => ProtectedRoute,
 } as any)
+const ProtectedInventoryProductsIndexRoute =
+  ProtectedInventoryProductsIndexRouteImport.update({
+    id: '/inventory/products/',
+    path: '/inventory/products/',
+    getParentRoute: () => ProtectedRoute,
+  } as any)
 const ProtectedInventoryMaterialsIndexRoute =
   ProtectedInventoryMaterialsIndexRouteImport.update({
     id: '/inventory/materials/',
@@ -81,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/supplier/': typeof ProtectedSupplierIndexRoute
   '/users/': typeof ProtectedUsersIndexRoute
   '/inventory/materials/': typeof ProtectedInventoryMaterialsIndexRoute
+  '/inventory/products/': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -92,6 +100,7 @@ export interface FileRoutesByTo {
   '/supplier': typeof ProtectedSupplierIndexRoute
   '/users': typeof ProtectedUsersIndexRoute
   '/inventory/materials': typeof ProtectedInventoryMaterialsIndexRoute
+  '/inventory/products': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -105,6 +114,7 @@ export interface FileRoutesById {
   '/_protected/supplier/': typeof ProtectedSupplierIndexRoute
   '/_protected/users/': typeof ProtectedUsersIndexRoute
   '/_protected/inventory/materials/': typeof ProtectedInventoryMaterialsIndexRoute
+  '/_protected/inventory/products/': typeof ProtectedInventoryProductsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -118,6 +128,7 @@ export interface FileRouteTypes {
     | '/supplier/'
     | '/users/'
     | '/inventory/materials/'
+    | '/inventory/products/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -129,6 +140,7 @@ export interface FileRouteTypes {
     | '/supplier'
     | '/users'
     | '/inventory/materials'
+    | '/inventory/products'
   id:
     | '__root__'
     | '/'
@@ -141,6 +153,7 @@ export interface FileRouteTypes {
     | '/_protected/supplier/'
     | '/_protected/users/'
     | '/_protected/inventory/materials/'
+    | '/_protected/inventory/products/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -213,6 +226,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProtectedClientClientIdRouteImport
       parentRoute: typeof ProtectedRoute
     }
+    '/_protected/inventory/products/': {
+      id: '/_protected/inventory/products/'
+      path: '/inventory/products'
+      fullPath: '/inventory/products/'
+      preLoaderRoute: typeof ProtectedInventoryProductsIndexRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
     '/_protected/inventory/materials/': {
       id: '/_protected/inventory/materials/'
       path: '/inventory/materials'
@@ -232,6 +252,7 @@ interface ProtectedRouteChildren {
   ProtectedSupplierIndexRoute: typeof ProtectedSupplierIndexRoute
   ProtectedUsersIndexRoute: typeof ProtectedUsersIndexRoute
   ProtectedInventoryMaterialsIndexRoute: typeof ProtectedInventoryMaterialsIndexRoute
+  ProtectedInventoryProductsIndexRoute: typeof ProtectedInventoryProductsIndexRoute
 }
 
 const ProtectedRouteChildren: ProtectedRouteChildren = {
@@ -243,6 +264,7 @@ const ProtectedRouteChildren: ProtectedRouteChildren = {
   ProtectedSupplierIndexRoute: ProtectedSupplierIndexRoute,
   ProtectedUsersIndexRoute: ProtectedUsersIndexRoute,
   ProtectedInventoryMaterialsIndexRoute: ProtectedInventoryMaterialsIndexRoute,
+  ProtectedInventoryProductsIndexRoute: ProtectedInventoryProductsIndexRoute,
 }
 
 const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(

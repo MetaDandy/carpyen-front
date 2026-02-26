@@ -6,6 +6,8 @@ import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/s
 import { Separator } from '@/components/ui/separator'
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { breadcrumb } from '@/constants/breadcrumb'
+import Cookies from 'js-cookie';
+import { useState } from 'react'
 
 export const Route = createFileRoute('/_protected')({
   component: ProtectedLayout,
@@ -14,13 +16,14 @@ export const Route = createFileRoute('/_protected')({
 function ProtectedLayout() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated)
   const breadcrumbs = useBreadcrumbStore((state) => state.breadcrumbs)
+  const [defaultOpen] = useState(() => Cookies.get('sidebar_state') === 'false' ? false : true)
 
   if (!isAuthenticated) {
     return <Navigate to="/" />
   }
 
   return (
-    <SidebarProvider>
+    <SidebarProvider defaultOpen={defaultOpen}>
       <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-12 border-b">
