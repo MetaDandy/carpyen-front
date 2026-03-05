@@ -69,12 +69,12 @@ const data = {
       icon: Bot,
       items: [
         {
-          title: "Productos",
-          url: "/inventory/products",
+          title: "Materiales",
+          url: "/inventory/materials",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Productos",
+          url: "/inventory/products",
         },
         {
           title: "Quantum",

@@ -18,14 +18,18 @@ const UserSchema = z.object({
 
 type User = z.infer<typeof UserSchema>;
 
-const CreateUserSchema = z.object({
+// base fields shared by create and update schemas
+const BaseUserFields = z.object({
     name: z.string().min(1, { message: "El nombre es requerido" }),
     email: z.email({ message: "El email no es válido" }),
     phone: z.string().optional(),
     address: z.string().optional(),
+    role: z.string().min(1, { message: "El rol es requerido" }),
+});
+
+const CreateUserSchema = BaseUserFields.extend({
     password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }),
     confirm_password: z.string().min(6, { message: "La confirmación de contraseña es requerida" }),
-    role: z.string().min(1, { message: "El rol es requerido" }),
 }).refine((data) => data.password === data.confirm_password, {
     message: "Las contraseñas no coinciden",
     path: ["confirm_password"],
@@ -33,7 +37,10 @@ const CreateUserSchema = z.object({
 
 type CreateUser = z.infer<typeof CreateUserSchema>;
 
-const UpdateUserSchema = CreateUserSchema.partial().refine((data) => {
+const UpdateUserSchema = BaseUserFields.partial().extend({
+    password: z.string().min(6, { message: "La contraseña debe tener al menos 6 caracteres" }).optional(),
+    confirm_password: z.string().min(6, { message: "La confirmación de contraseña es requerida" }).optional(),
+}).refine((data) => {
     if (data.password && data.confirm_password) {
         return data.password === data.confirm_password;
     }
