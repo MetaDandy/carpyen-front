@@ -1,10 +1,10 @@
-import { Navigate, createFileRoute, Outlet } from '@tanstack/react-router'
+import { Navigate, createFileRoute, Outlet, Link } from '@tanstack/react-router'
 import { useAuthStore } from '@/store/auth'
 import { useBreadcrumbStore } from '@/store/breadcrumb'
 import { AppSidebar } from '@/components/sidebar/app-sidebar'
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { Separator } from '@/components/ui/separator'
-import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '@/components/ui/breadcrumb'
 import { breadcrumb } from '@/constants/breadcrumb'
 import Cookies from 'js-cookie';
 import { useState } from 'react'
@@ -36,20 +36,24 @@ function ProtectedLayout() {
             <Breadcrumb>
               <BreadcrumbList>
                 <BreadcrumbItem>
-                  <BreadcrumbLink href={breadcrumb.dashboard.path}>
+                  <Link to={breadcrumb.dashboard.path} className="hover:text-foreground">
                     {breadcrumb.dashboard.label}
-                  </BreadcrumbLink>
+                  </Link>
                 </BreadcrumbItem>
 
                 {breadcrumbs.map(({ label, path }, index) => (
-                  <BreadcrumbItem key={path}>
-                    <BreadcrumbSeparator />
-                    {index === breadcrumbs.length - 1 ? (
-                      <BreadcrumbPage>{label}</BreadcrumbPage>
-                    ) : (
-                      <BreadcrumbLink href={path}>{label}</BreadcrumbLink>
-                    )}
-                  </BreadcrumbItem>
+                  [
+                    <BreadcrumbSeparator key={`sep-${path}`} />,
+                    <BreadcrumbItem key={path}>
+                      {index === breadcrumbs.length - 1 ? (
+                        <BreadcrumbPage>{label}</BreadcrumbPage>
+                      ) : (
+                        <Link to={path} className="hover:text-foreground">
+                          {label}
+                        </Link>
+                      )}
+                    </BreadcrumbItem>,
+                  ]
                 ))}
               </BreadcrumbList>
             </Breadcrumb>

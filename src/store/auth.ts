@@ -1,5 +1,10 @@
 import type { User } from '@/services/user/user.schema'
 import userService from '@/services/user/user.service'
+import {
+  isTokenExpiredFromCookie,
+  isTokenExpiringSoon,
+  getMinutesUntilExpiry,
+} from '@/lib/jwt'
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
@@ -11,6 +16,9 @@ interface AuthStore {
   logout: () => Promise<void>
   setUser: (user: User) => void
   refreshAccessToken: () => Promise<void>
+  isTokenExpired: () => boolean // Verifica si el token está expirado (leyendo cookie)
+  isTokenExpiringSoon: (minutesThreshold?: number) => boolean // Verifica si el token caduca pronto
+  getMinutesUntilExpiry: () => number // Retorna minutos hasta expiración
 }
 
 export const useAuthStore = create<AuthStore>()(
@@ -24,7 +32,10 @@ export const useAuthStore = create<AuthStore>()(
         set({ loading: true })
         try {
           const user = await userService.login({ email, password })
-          set({ user, isAuthenticated: true })
+          set({
+            user,
+            isAuthenticated: true,
+          })
         } catch (error) {
           console.error('Error al iniciar sesión:', error)
           throw error
@@ -52,13 +63,28 @@ export const useAuthStore = create<AuthStore>()(
       refreshAccessToken: async () => {
         try {
           await userService.refreshToken()
-          // Si llegó aquí, el refresh fue exitoso
+          // El token se actualiza en la cookie automáticamente
         } catch (error) {
           // El refresh falló, significa que el refresh token expiró
           console.error('Refresh token expirado, logout requerido')
           set({ isAuthenticated: false, user: null })
           throw error
         }
+      },
+
+      // Verifica si el token ha expirado (leyendo de la cookie)
+      isTokenExpired: () => {
+        return isTokenExpiredFromCookie()
+      },
+
+      // Verifica si el token está próximo a expirar (leyendo de la cookie)
+      isTokenExpiringSoon: (minutesThreshold: number = 5) => {
+        return isTokenExpiringSoon(minutesThreshold)
+      },
+
+      // Obtiene los minutos restantes hasta expiración (leyendo de la cookie)
+      getMinutesUntilExpiry: () => {
+        return getMinutesUntilExpiry()
       },
     }),
     {

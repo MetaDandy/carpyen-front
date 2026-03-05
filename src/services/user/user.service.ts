@@ -7,6 +7,7 @@ class UserService {
     async login(login: Login): Promise<User> {
         try {
             const response = await api.post('/users/login', login)
+            // El backend retorna solo el usuario, la expiración viene en la cookie 'tokenExpiry'
             return response.data
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -100,6 +101,7 @@ class UserService {
 
     async refreshToken(): Promise<void> {
         try {
+            // El backend retorna solo status OK, los tokens se actualizan en las cookies
             await api.post('/users/refresh')
         } catch (error) {
             if (axios.isAxiosError(error)) {
